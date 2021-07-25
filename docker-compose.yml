@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+    db:
+        image: postgres:latest
+        restart: always
+        ports:
+            - 3346:5432
+        networks: 
+            - backend_net
+        volumes:
+            - ./db_data:/var/lib/postgresql/data"
+        env_file:
+            - .env
+
+    backend:
+        build:
+            context: .
+        command: bash -c "echo 'waiting for db start up' && sleep 30 && python -m unittest discover -s tests -v test && python db_startup.py && python app.py" 
+        restart: on-failure
+        ports:
+            - 5000:5000
+        networks: 
+            - backend_net
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://db:5432"]
+            interval: 30s
+            timeout: 20s
+            retries: 5
+        volumes:
+            - .:/app
+        links:
+            - db:db
+        env_file: 
+            - .env
+        depends_on:
+           - db
+volumes: 
+    db-data:
+    
+networks:
+    backend_net:
+        driver: "bridge"
