@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Checkout Basket</title>
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+          <script>
+                    $(document).ready(function() {
+
+                    var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID
+                    var AddButton       = $("#AddMoreFileBox"); //Add button ID
+                    
+                    var x = InputsWrapper.length; //initlal text box count
+                    var FieldCount=1; //to keep track of text box added
+                    
+                    $(AddButton).click(function (e)  //on add input button click
+                    {
+                    FieldCount++; //text box added increment
+                    //add input box
+                    $(InputsWrapper).append('<div class="row"><p class="col-xs-6"><input type="text" class="form-control product_list" list="product" name="product[]" id="field_'+ FieldCount +'"/></p><a href="#" class="btn btn-danger removeclass">×</a></div>');
+                    x++; //text box increment
+                    return false;
+                    });
+                    
+                    $("body").on("click",".removeclass", function(e){ //user click on remove text
+                         if( x > 1 ) {
+                                   $(this).parent('div').remove(); //remove text box
+                                   x--; //decrement textbox
+                         }
+                    return false;
+                    })
+                    $('#submit').click(function(){            
+                              $.ajax({  
+                                   url:"/checkout",
+                                   method:"POST", 
+                                   data:$('#products').serialize(),  
+                                   success:function(data)  
+                                   {
+                                        $('#resultbox').html(data);
+                                        $('#products')[0].reset();  
+                                   }
+                              });
+                         }); 
+                    });
+
+          </script>
+          <script>
+              function findTotal(){
+                    var inputs, index, temp;
+                    tot = 0
+                    inputs = document.getElementsByClassName('form-control');
+                    for (index = 0; index < inputs.length; ++index) {
+                         console.log(inputs[index].value)
+                         if(inputs[index].value.length!=0) {
+                              temp = inputs[index].value.split(" ")[3]
+				          tot += parseFloat(temp);
+			          }
+                    }
+                    document.getElementById('total').value = tot;
+               }
+          </script>
+          <style>
+               .row {padding:10px;}
+               table {
+               font-family: arial, sans-serif;
+               border-collapse: collapse;
+               width: 100%;
+               }
+
+               td, th {
+               border: 1px solid #dddddd;
+               text-align: left;
+               padding: 8px;
+               }
+
+               tr:nth-child(even) {
+               background-color: #dddddd;
+               }
+          </style>
+          <div class="container">
+               <br />
+               <br />
+               <h2 align="center">Add items to Basket</h2>
+               <h3>Offers Available</h3>
+               <table>
+                    <tr>
+                      <th>Code</th>
+                      <th>Desccrption</th>
+                    </tr>
+                    {% for d1,d2 in applicable_offers %}
+                    <tr>
+                    <td>{{d1}}</td>
+                    <td>{{d2}}</td>
+                    </tr>
+                    {% endfor %}
+               </table>
+               <div id="resultbox"></div>
+               <div class="form-group">
+                    <form name="products" id="products">
+                         <div id="InputsWrapper">
+                              <div class="row">
+                                   <div class="col-xs-6">
+                                        <input type="text" name="product[]" class="form-control product_list" list="product"/>
+                                   </div>
+                                   <datalist id="product">
+                                   {% for pd in product_data %}
+                                        
+                                        <option>{{pd}}</option>
+                                   {% endfor %}
+                              
+                                   </datalist>
+                                   <div class="col-xs-6">
+                                        <button type="button" name="add" id="AddMoreFileBox" class="btn btn-success">Add More</button>
+                                   </div>
+                              </div>
+                         </div>
+                         <br/>
+                         <input type="button" value="Calculate Total" class="btn btn-info" onclick="findTotal()" />
+                         <input type="text" width="100px" id="total">
+                         <input type="button" name="submit" id="submit" class="btn btn-info" value="Apply Offers" />
+                    </form>
+               </div>
+          </div>
+	</body>
+</html>

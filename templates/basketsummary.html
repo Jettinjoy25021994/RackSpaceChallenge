@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+</style>
+</head>
+<body>
+  <script>
+    function newFunction() {
+       document.getElementById("products").reset();
+    }
+ </script>
+
+<h2 align="center">Basket Summary</h2>
+
+<table>
+  <tr>
+    <th>Product</th>
+    <th>Count</th>
+  </tr>
+  {% for d1,d2 in final_products %}
+  <tr>
+  <td>{{d1}}</td>
+  <td>{{d2}}</td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <td>Total Price</td>
+    <td>{{total_price}}</td>
+  </tr>
+</table>
+</body>
+</html>
